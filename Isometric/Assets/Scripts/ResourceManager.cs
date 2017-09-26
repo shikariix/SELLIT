@@ -19,6 +19,13 @@ public class ResourceManager : MonoBehaviour {
 		anim.enabled = false;
 	}
 
+	void FixedUpdate() {
+		float height = transform.position.y;
+		if (height < -40) {
+			Destroy (gameObject);
+		}
+	}
+
 	void OnTriggerStay(Collider col) {
 		if (col.gameObject.tag == "Player") {
 			player = col.gameObject;
@@ -29,24 +36,7 @@ public class ResourceManager : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerExit(Collider col) {
-		inRange = false;
-	}
-
-	void OnMouseDown() {
-		Debug.Log ("Click!");
-		if (playerManager != null) {
-			if (Input.GetMouseButtonDown (0) && !isHeld && !playerManager.holdingBlock && inRange) {
-				playerManager.holdingBlock = true;
-				PickedUp ();
-			} else if (Input.GetMouseButtonDown (0) && isHeld && playerManager.holdingBlock) {
-				playerManager.holdingBlock = false;
-				PutDown ();
-			} 
-		}
-	}
-
-	void PickedUp() {
+	public void PickedUp() {
 		//Make block a child of player
 		isHeld = true;
 		transform.parent = player.transform;
@@ -55,13 +45,12 @@ public class ResourceManager : MonoBehaviour {
 		anim.Play ("Held");
 		anim.SetBool ("isDropped", false);
 		rb.useGravity = false;
-		rb.isKinematic = true;
 		transform.position = player.transform.position;
 		transform.rotation = player.transform.rotation;
-		playerManager.block = GetComponent<ResourceManager> ();
+		playerManager.resource = GetComponent<ResourceManager> ();
 	}
 
-	void PutDown() {
+	public void PutDown() {
 		//return freedom to block
 		isHeld = false;
 		anim.enabled = false;
@@ -69,11 +58,20 @@ public class ResourceManager : MonoBehaviour {
 		transform.parent = null;
 		transform.position = player.transform.position;
 		rb.useGravity = true;
-		rb.isKinematic = false;
 	}
 
 	public void Animate() {
-		Debug.Log("Attack using Block!");
 		anim.Play ("BlockAttack");
+	}
+
+	void OnCollisionEnter (Collision col) {
+		if (col.gameObject.GetType().ToString() == "Terrain") {
+			col = null;
+		}
+		if (col.gameObject.tag == "Player" && isHeld) {
+			Rigidbody rbPlayer = col.gameObject.GetComponent<Rigidbody> ();
+
+			rbPlayer.AddForce (gameObject.transform.forward * 600);
+		}
 	}
 }

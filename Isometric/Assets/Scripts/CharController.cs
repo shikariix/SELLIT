@@ -5,7 +5,10 @@ using UnityEngine;
 public class CharController : MonoBehaviour {
 
 	[SerializeField]
-	public float moveSpeed = 8f;
+	public float moveSpeed = 12f;
+	public string jumpButton = "Jump_P1";
+	public string horizontalControl = "Horizontal_P1";
+	public string VerticalControl = "Vertical_P1";
 
 	private Vector3 forward, right;
 	private Rigidbody rb;
@@ -21,9 +24,17 @@ public class CharController : MonoBehaviour {
 	
 
 	void Update () {
-		if (Input.anyKey) {
-			Move ();
+		//Activate motion
+		Move ();
+		//Single jump
+		if (Input.GetButtonDown (jumpButton) && canJump) {
+			rb.AddForce (new Vector3 (0, 300, 0));
+			canJump = false;
 		}
+		//Pijltjes voor specials
+		//SQR voor attack
+		//O voor oppakken
+		//X voor jump
 	}
 
 	void OnCollisionEnter(Collision col) {
@@ -39,19 +50,13 @@ public class CharController : MonoBehaviour {
 
 	//Sets motion to the way you expect to move instead of world axis
 	void Move () {
-		
-		Vector3 rightMovement = right * moveSpeed * Time.deltaTime * Input.GetAxis ("Horizontal");
-		Vector3 forwardMovement = forward * moveSpeed * Time.deltaTime * Input.GetAxis ("Vertical");
+		Vector3 rightMovement = right * moveSpeed * Time.deltaTime * Input.GetAxis (horizontalControl);
+		Vector3 forwardMovement = forward * moveSpeed * Time.deltaTime * Input.GetAxis (VerticalControl);
 
 		Vector3 heading = Vector3.Normalize (rightMovement + forwardMovement);
 		transform.forward += heading;
 		transform.position += rightMovement;
 		transform.position += forwardMovement;
 
-		//Single jump
-		if (Input.GetKeyDown (KeyCode.Space) && canJump) {
-			rb.AddForce (new Vector3 (0, 300, 0));
-			canJump = false;
-		}
 	}
 }

@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class TowerManager : MonoBehaviour {
 
-	private float height;
-	private string team; //???
+
+	public string team = "Team_1";
 	public PlayerManager player;
+
+	private float height;
 	private Transform towerTransform;
 	private ResourceManager resource;
 
@@ -26,14 +28,12 @@ public class TowerManager : MonoBehaviour {
 		if (col.gameObject.tag == "Player") {
 			player = col.gameObject.GetComponent<PlayerManager> ();
 			//check if player is carrying block
-			if (player.holdingBlock && Input.GetMouseButtonDown(0)) {
-				resource = col.gameObject.GetComponentInChildren<ResourceManager> ();
-				Build ();
-			}
+			resource = col.gameObject.GetComponentInChildren<ResourceManager> ();
+
 		}
 	}
 
-	void Build() {
+	public void Build() {
 		//If the block is requested, it can be placed
 		//The placed block is taken out of the list
 		//when all items on the list have been given, the tower gains height
